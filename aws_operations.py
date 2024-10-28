@@ -15,10 +15,9 @@ with zipfile.ZipFile(zip_path, "r") as z:
         df = pd.read_csv(file)
 
 creds = pd.read_csv("./Credentials/vivek-ml_accessKeys.csv")
+region_name = "us-east-1"
 
 s3 = boto3.client("s3")
-
-region_name = "us-east-1"
 
 s3 = boto3.resource(
     service_name="s3",
@@ -40,6 +39,17 @@ os.environ["AWS_REGION"] = region_name
 """Print all buckets"""
 for bucket in s3.buckets.all():
     print(bucket)
+
+"""Delete bucket"""
+"""Step 1 : Delete all the object present in bucket"""
+versions = bucket.object_versions.all()
+for version in versions:
+    version.delete()
+    
+    print(f"Deleted version: {version.id} of object: {version.object_key}")
+"""Step 2: Delete the bucket itself"""
+bucket = s3.Bucket('learntest5')
+bucket.delete()
 
 """print all the objects inside a bucket"""
 for obj in s3.Bucket("learntest5").objects.all():
